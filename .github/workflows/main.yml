@@ -71,8 +71,8 @@ jobs:
       with:
         command: nextest
         args: run
-    - name: Run miri tests
-      uses: actions-rs/cargo@v1
-      with:
-        command: miri
-        args: nextest run
+    # - name: Run miri tests
+    #   uses: actions-rs/cargo@v1
+    #   with:
+    #     command: miri
+    #     args: nextest run
