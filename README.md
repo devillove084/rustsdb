@@ -1,18 +1,8 @@
-
-
-
-
-  <h3 align="center">rustsdb</h3>
+<h3 align="center">rustsdb</h3>
 
 ## About The Project
 
 This project was created with full reference to opentsdb3.0, with the aim of creating a simple but commercially available temporal database using a more modern approach, using rust build can avoid the performance loss caused by using a language with gc, I hope you can contribute more and don't be stingy with your comments!
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-### Built With
-
-> cargo run/test
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
