@@ -1,1 +1,78 @@
+name: CI
 
+env:
+  RUSTUP_MAX_RETRIES: 10
+  CARGO_NET_RETRY: 10
+  CARGO_INCREMENTAL: 0        # reduce an extra dependency-tracking overhead added by incremental
+  CARGO_PROFILE_DEV_DEBUG: 0  # disable debug info for reducing binary size
+  CI: 1
+
+on:
+  push:
+  pull_request:
+    paths-ignore:
+      - "docs/**"
+      - "**.md"
+      - "scripts/**"
+      - "conf/**"
+
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  # license:
+  #   name: Check license header
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - uses: apache/skywalking-eyes/header@501a28d2fb4a9b962661987e50cf0219631b32ff
+  #       with:
+  #         config: tools/ci/licenserc.yml
+
+  test:
+    name: Run tests
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: abelfodil/protoc-action@v1
+      with:
+        protoc-version: '3.19.4'
+        enable-dart: false
+    - uses: actions/checkout@v2
+    - name: Install cargo-nextest
+      uses: baptiste0928/cargo-install@v1
+      with:
+        crate: cargo-nextest
+    - name: Checkout repository
+      uses: actions/checkout@v2
+    - uses: Swatinem/rust-cache@v1
+    - name: Cargo build
+      uses: actions-rs/cargo@v1
+      with:
+        command: build
+    - name: Check diff
+      run: git diff --exit-code
+    - name: Check clippy
+      uses: actions-rs/cargo@v1
+      with:
+        command: clippy
+        args: --workspace --tests --all-features -- -D warnings
+    - name: Check format
+      uses: actions-rs/cargo@v1
+      with:
+        command: fmt
+        args: --all -- --check
+    - name: Cargo test
+      uses: actions-rs/cargo@v1
+      with:
+        command: nextest
+        args: run
+    - name: Run miri tests
+      uses: actions-rs/cargo@v1
+      with:
+        command: miri
+        args: nextest run
