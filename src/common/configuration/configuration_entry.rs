@@ -6,9 +6,9 @@ use super::{
     configuration_override::ConfigurationOverride, Configuration,
 };
 
-pub(crate) struct ConfigurationEntry<T> {
-    config: Configuration<T>,
-    schema: ConfigurationEntrySchema<T>,
-    settings: Vec<ConfigurationOverride<T>>,
-    callbacks: HashSet<Box<dyn ConfigurationCallback<T>>>,
+pub(crate) struct ConfigurationEntry {
+    config: Configuration,
+    schema: ConfigurationEntrySchema,
+    settings: Vec<ConfigurationOverride>,
+    callbacks: HashSet<Box<dyn ConfigurationCallback>>,
 }

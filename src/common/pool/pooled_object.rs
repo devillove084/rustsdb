@@ -1,7 +1,5 @@
 pub(crate) trait PooledObject {
-    type Object;
-
-    fn object(&self) -> Self::Object;
+    fn object(&self) -> Box<dyn PooledObject>;
 
     fn release(&self);
 }

@@ -4,7 +4,7 @@ use super::Comparable;
 /// Implementations can provide as high or low resolution as desired.
 /// The `units` describe what resolution this timestamps is encoded at.
 /// Possibel values from `ChronoUnit#SECONDS` to `ChronoUnit#NANOS`
-pub(crate) trait TimeStamp: Comparable + Copy + Clone {
+pub(crate) trait TimeStamp {
     fn nanos(&self) -> u64;
 
     fn ms_epoch(&self) -> u64;
@@ -15,7 +15,7 @@ pub(crate) trait TimeStamp: Comparable + Copy + Clone {
 
     fn update_epoch(&self, ts: u64);
 
-    fn update_timestamp<T: TimeStamp>(&self, ts: T);
+    fn update_timestamp(&self, ts: dyn TimeStamp);
 
     fn update_epoch_with_nano(&self, epoch: u64, nano: u64);
 

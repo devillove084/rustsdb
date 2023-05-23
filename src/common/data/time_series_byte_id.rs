@@ -7,5 +7,5 @@ pub(crate) trait TimeSeriesID {
     fn hashcode(&self) -> u64;
 
     // The type series dealt with. Either a `TimeSeriesByteID` or `TimeSeriesStringID`.
-    fn get_type<T: TimeSeriesID>(&self, _: T) -> &str;
+    // fn get_type<T: TimeSeriesID>(&self, _: T) -> &str;
 }

@@ -15,11 +15,12 @@ use super::{
 /// <p>
 /// All data types will contain data within the same time range for this time series.
 
-pub(crate) trait TimeSeries<T: TimeSeriesID> {
-    fn id(&self) -> T;
+pub(crate) trait TimeSeries {
+    fn id(&self) -> Box<dyn TimeSeriesID>;
 
-    fn iterator<IT: TimeSeriesDataType + Iterator>(
-        &self,
-        t: IT,
-    ) -> Option<impl TypedTimeSeriesIterator<IT>>;
+    // TODO: Maybe not!
+    // fn iterator<IT: TimeSeriesDataType + Iterator>(
+    //     &self,
+    //     t: IT,
+    // ) -> Option<impl TypedTimeSeriesIterator<IT>>;
 }

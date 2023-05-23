@@ -31,18 +31,18 @@ pub const PLUGIN_DIRECTORY_REX: &str = r"^[\w+\d+\/\.\\:\-]+$";
 
 pub const CONFIG_RELOAD_INTERVAL_KEY: &str = "config.reload.interval";
 
-pub struct Configuration<T> {
-    merged_config: HashMap<String, ConfigurationEntry<T>>,
-    providers: Vec<Box<dyn Provider<T>>>,
-    secret_providers: HashMap<String, Box<dyn SecretProvider<T>>>,
+pub(crate) struct Configuration {
+    merged_config: HashMap<String, ConfigurationEntry>,
+    providers: Vec<Box<dyn Provider>>,
+    secret_providers: HashMap<String, Box<dyn SecretProvider>>,
     provider_config: String,
     provider_path: String,
-    factories: Vec<Box<dyn ProviderFactory<T>>>,
+    factories: Vec<Box<dyn ProviderFactory>>,
     reload_keys: HashSet<String>,
     timer: WheelTimer,
 }
 
-impl<T> Configuration<T> {
+impl Configuration {
     pub async fn new_configuration(&self, properties: HashMap<String, String>) -> Self {
         todo!()
     }

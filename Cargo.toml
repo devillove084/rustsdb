@@ -9,3 +9,4 @@ edition = "2021"
 regex = "1.8.1"
 async-trait = "0.1.68"
 hashed_wheel_timer = "0.1.1"
+bytes = { version = "1", features = ["serde"] }

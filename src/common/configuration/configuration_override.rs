@@ -1,6 +1,8 @@
-pub(crate) struct ConfigurationOverride<T> {
+use bytes::Bytes;
+
+pub(crate) struct ConfigurationOverride {
     secret: bool,
     source: String,
-    value: T,
+    value: Bytes,
     last_change: u64,
 }

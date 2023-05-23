@@ -1,10 +1,10 @@
 use crate::common::{core::tsdb::TSDB, data::time_series_byte_id::TimeSeriesID};
 
-#[async_trait::async_trait]
-pub(crate) trait QueryContext<T> {
-    type QueryTimeSeriesID: TimeSeriesID;
+use super::query_sink::QuerySink;
 
-    // async fn sinks(&self) -> Vec<QuerySink>;
+#[async_trait::async_trait]
+pub(crate) trait QueryContext {
+    async fn sinks(&self) -> Vec<Box<dyn QuerySink>>;
 
     // async fn mode(&self) -> QueryMode;
 

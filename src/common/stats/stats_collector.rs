@@ -7,14 +7,14 @@ pub(crate) trait StatsTimer {
 }
 
 #[async_trait::async_trait]
-pub(crate) trait StatsCollector<T>: TSDBPlugin<T> {
+pub(crate) trait StatsCollector: TSDBPlugin {
     async fn increment_counter(&self, metric: String, tags: Vec<String>);
 
     async fn increment_counter_with_amount(&self, metric: String, amount: u64, tags: Vec<String>);
 
     async fn set_gauge(&self, metric: String, value: u64, tags: Vec<String>);
 
-    async fn start_timer(&self, metric: String, units: u64) -> impl StatsTimer;
+    async fn start_timer(&self, metric: String, units: u64) -> Box<dyn StatsTimer>;
 
     async fn add_time(&self, metric: String, duration: u64, units: u64, tags: Vec<String>);
 }

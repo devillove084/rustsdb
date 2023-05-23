@@ -7,57 +7,51 @@ use std::{collections::HashMap, future::Future};
 use super::tsdb::TSDB;
 
 #[async_trait::async_trait]
-pub(crate) trait Registry<T> {
-    type Object;
-    type RegistryTSDB: TSDB<T>;
-    type RegisterTimeSeriesType: TimeSeriesDataType;
-    type RegistryObjectPool: ObjectPool;
+pub(crate) trait Registry {
+    // type Object;
+    // type RegistryTSDB: TSDB;
+    // type RegisterTimeSeriesType: TimeSeriesDataType;
+    // type RegistryObjectPool: ObjectPool;
 
-    // TODO: How to represent a "defered<Object>"?
     async fn initialize(&self, load_plugins: bool);
-    // TODO: may not be best choice
-    async fn cleanup_pool(&self) -> dyn Future<Output = T>;
 
-    async fn register_plugin<U>(
-        &self,
-        id: String,
-        plugin: dyn TSDBPlugin<T, PluginUseTSDB = Self::RegistryTSDB>,
-    );
+    // async fn cleanup_pool(&self) -> dyn Future<Output = Self>;
 
-    async fn get_default_plugin<U>(&self) -> U;
+    async fn register_plugin(&self, id: String, plugin: dyn TSDBPlugin);
 
-    async fn get_plugin<U>(&self, id: String) -> U;
+    // async fn get_default_plugin<U>(&self) -> Box<U>;
 
-    async fn get_plugins<U>(&self) -> Vec<U>;
+    // async fn get_plugin<U>(&self, id: String) -> Box<U>;
 
-    async fn plugins<U>(
-        &self,
-    ) -> HashMap<U, HashMap<String, Box<dyn TSDBPlugin<T, PluginUseTSDB = Self::RegistryTSDB>>>>;
+    // async fn get_plugins<U>(&self) -> Vec<Box<U>>;
 
-    async fn register_shared_object(&self, id: String, obj: Self::Object) -> Self::Object;
+    // async fn plugins<U>(&self) -> HashMap<Box<U>, HashMap<String, Box<dyn TSDBPlugin>>>;
 
-    async fn register_object_pool(&self, pool: Self::RegistryObjectPool);
+    // TODO: Box<()> represent the java's Object
+    async fn register_shared_object(&self, id: String, obj: Box<()>) -> Box<()>;
 
-    fn get_object_pool(&self, id: String) -> Self::RegistryObjectPool;
+    fn get_shared_object(&self, id: String) -> Box<()>;
 
-    fn get_shared_object(&self, id: String) -> Self::Object;
+    fn shared_object(&self) -> HashMap<String, Box<()>>;
 
-    fn shared_object(&self) -> HashMap<String, Self::Object>;
+    async fn register_object_pool(&self, pool: Box<dyn ObjectPool>);
+
+    fn get_object_pool(&self, id: String) -> Box<dyn ObjectPool>;
 
     // TODO: need add query node factory
 
     async fn register_type(
         &self,
-        typ: Self::RegisterTimeSeriesType,
+        typ: Box<dyn TimeSeriesDataType>,
         name: String,
         is_default_name: bool,
     );
 
-    fn get_default_name(&self, tye: Self::RegisterTimeSeriesType) -> String;
+    fn get_default_name(&self, tye: Box<dyn TimeSeriesDataType>) -> String;
 
-    fn type_map(&self) -> HashMap<String, Self::RegisterTimeSeriesType>;
+    fn type_map(&self) -> HashMap<String, Box<dyn TimeSeriesDataType>>;
 
-    fn default_type_name_map(&self) -> HashMap<Self::RegisterTimeSeriesType, String>;
+    fn default_type_name_map(&self) -> HashMap<Box<dyn TimeSeriesDataType>, String>;
 
     async fn shutdown(&self);
 }
