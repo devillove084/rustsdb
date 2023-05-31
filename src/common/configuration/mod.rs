@@ -42,6 +42,12 @@ pub(crate) struct Configuration {
     timer: WheelTimer,
 }
 
+impl Clone for Configuration {
+    fn clone(&self) -> Self {
+        todo!()
+    }
+}
+
 impl Configuration {
     pub async fn new_configuration(&self, properties: HashMap<String, String>) -> Self {
         todo!()

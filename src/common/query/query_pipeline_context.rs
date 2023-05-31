@@ -24,14 +24,11 @@ where
     B: Builder<B, C>,
     C: QueryNodeConfig<B, C>,
 {
-    // type PipeSpan: Span;
-    // type PipeQueryNode: QueryNode<B, C>;
-
     async fn factory(&self) -> Box<dyn QueryNodeFactory<B, C>>;
 
     fn tsdb(&self) -> Box<dyn TSDB>;
 
-    async fn query(&self) -> Box<dyn TimeSeriesQuery<B, C>>;
+    async fn query(&self) -> Box<dyn TimeSeriesQuery>;
 
     async fn query_context(&self) -> Box<dyn QueryContext>;
 
@@ -43,16 +40,15 @@ where
 
     async fn downstream(&self, node: Box<dyn QueryNode<B, C>>) -> Vec<Box<dyn QueryNode<B, C>>>;
 
-    // async fn downstream_sources(
-    //     &self,
-    //     node: Self::PipeQueryNode,
-    // ) -> Vec<Box<dyn TimeSeriesDataSource<B, T>>>;
+    async fn downstream_sources(
+        &self,
+        node: Box<dyn QueryNode<B, C>>,
+    ) -> Vec<Box<dyn TimeSeriesDataSource<B, C>>>;
 
-    // TODO: T is different from C
-    // async fn common_source_config(
-    //     &self,
-    //     node: Self::PipeQueryNode,
-    // ) -> impl TimeSeriesDataSourceConfig<B, C>;
+    async fn common_source_config(
+        &self,
+        node: Box<dyn QueryNode<B, C>>,
+    ) -> Box<dyn TimeSeriesDataSourceConfig<B, C>>;
 
     async fn downstream_sources_ids(&self, node: Box<dyn QueryNode<B, C>>) -> Vec<String>;
 
@@ -71,9 +67,9 @@ where
         node: Box<dyn QueryNode<B, C>>,
     ) -> Vec<Box<dyn QueryNode<B, C>>>;
 
-    // async fn sinks(&self) -> Vec<Box<dyn QuerySink<T>>>;
+    async fn sinks(&self) -> Vec<Box<dyn QuerySink>>;
 
-    // async fn add_id(&self, hash: u64, id: dyn TimeSeriesID);
+    async fn add_id(&self, hash: u64, id: Box<dyn TimeSeriesID>);
 
     async fn get_id(&self, hash: u64) -> Box<dyn TimeSeriesID>;
 

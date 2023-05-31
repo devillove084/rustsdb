@@ -1,6 +1,9 @@
 pub mod filter;
+pub mod interpolation;
 pub mod plan;
 pub mod query_context;
+pub mod query_fill_policy;
+pub mod query_iter_factory;
 pub mod query_mode;
 pub mod query_node;
 pub mod query_node_config;
@@ -11,6 +14,7 @@ pub mod query_result;
 pub mod query_result_id;
 pub mod query_sink;
 pub mod query_sink_callback;
+pub mod query_sink_config;
 pub mod serdes;
 pub mod time_series_query;
 pub mod util;

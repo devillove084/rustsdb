@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::hash::Hash;
 
 use crate::common::configuration::Configuration;
 
@@ -28,8 +29,12 @@ where
 
     async fn build(&self) -> B;
 
-    // TODO: May not be a good enough design
     fn return_self(&self) -> B;
+}
+
+#[async_trait::async_trait]
+pub(crate) trait GetQueryNodeOption<T> {
+    async fn node_options(option: QueryNodeConfigOptions) -> T;
 }
 
 #[async_trait::async_trait]
@@ -47,8 +52,6 @@ where
     fn is_push_down(&self) -> bool;
 
     fn is_joins(&self) -> bool;
-
-    // async fn node_option<U>(&self, option: QueryNodeConfigOptions) -> U;
 
     fn is_node_flag(&self, option: QueryNodeConfigOptions) -> bool;
 
@@ -77,17 +80,16 @@ where
     async fn mark_cacheable(&self);
 }
 
-// TODO: reimplentment them
-// impl<B: Builder<B, T>, T> Hash for dyn QueryNodeConfig<B, T> {
-//     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-//         todo!()
-//     }
-// }
+impl<B, C> Hash for dyn QueryNodeConfig<B, C> {
+    fn hash<H: std::hash::Hasher>(&self, _state: &mut H) {
+        todo!()
+    }
+}
 
-// impl PartialEq for dyn QueryNodeConfig {
-//     fn eq(&self, other: &Self) -> bool {
-//         todo!()
-//     }
-// }
+impl<B, C> PartialEq for dyn QueryNodeConfig<B, C> {
+    fn eq(&self, _other: &Self) -> bool {
+        todo!()
+    }
+}
 
-// impl Eq for dyn QueryNodeConfig {}
+impl<B, C> Eq for dyn QueryNodeConfig<B, C> {}

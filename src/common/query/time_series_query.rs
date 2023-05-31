@@ -1,3 +1,5 @@
+use std::hash::Hash;
+
 use crate::common::data::timestamp::TimeStamp;
 
 use super::{
@@ -25,15 +27,15 @@ pub(crate) enum CacheMode {
 }
 
 #[async_trait::async_trait]
-pub(crate) trait TimeSeriesQuery<B, C>
+trait AsyncGetExeGraph<B, C>
 where
     B: Builder<B, C>,
     C: QueryNodeConfig<B, C>,
 {
-    // type TimerSeriesTimeStamp: TimeStamp;
-    // type TimeSeriesQueryConfig: QueryNodeConfig<B, C>;
-    // type TimeSeriesNamedFilter: NamedFilter;
+    async fn get_execution_graph(&self) -> Vec<Box<dyn QueryNodeConfig<B, C>>>;
+}
 
+pub(crate) trait TimeSeriesQuery {
     fn get_start(&self) -> String;
 
     fn get_end(&self) -> String;
@@ -47,8 +49,6 @@ where
     fn get_filters(&self) -> Vec<Box<dyn NamedFilter>>;
 
     fn get_filter(&self, filter_id: String) -> Box<dyn QueryFilter>;
-
-    async fn get_execution_graph(&self) -> Vec<Box<dyn QueryNodeConfig<B, C>>>;
 
     fn start_time(&self) -> Box<dyn TimeStamp>;
 
@@ -65,20 +65,22 @@ where
     fn is_warn_enable(&self) -> bool;
 }
 
-// TODO: fix this
+impl PartialEq for dyn TimeSeriesQuery {
+    fn eq(&self, _other: &Self) -> bool {
+        todo!()
+    }
+}
 
-// impl PartialEq for dyn TimeSeriesQuery {
-//     fn eq(&self, other: &Self) -> bool {
-//         todo!()
-//     }
-// }
+impl Eq for dyn TimeSeriesQuery {}
 
-// impl Eq for dyn TimeSeriesQuery {}
+impl PartialOrd for dyn TimeSeriesQuery {
+    fn partial_cmp(&self, _other: &Self) -> Option<std::cmp::Ordering> {
+        todo!()
+    }
+}
 
-// impl PartialOrd for dyn TimeSeriesQuery {
-//     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-//         todo!()
-//     }
-// }
-
-// impl Hash for dyn TimeSeriesQuery {}
+impl Hash for dyn TimeSeriesQuery {
+    fn hash<H: std::hash::Hasher>(&self, _state: &mut H) {
+        todo!()
+    }
+}

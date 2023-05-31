@@ -6,7 +6,20 @@ use crate::common::{
     rollup::rollup_config::RollupConfig,
 };
 
-use super::{query_node::QueryNode, query_result_id::QueryResultID};
+use super::{
+    query_node::QueryNode,
+    query_node_config::{Builder, QueryNodeConfig},
+    query_result_id::QueryResultID,
+};
+
+#[async_trait::async_trait]
+pub(crate) trait GetSource<B, C>
+where
+    B: Builder<B, C>,
+    C: QueryNodeConfig<B, C>,
+{
+    async fn source(&self) -> Box<dyn QueryNode<B, C>>;
+}
 
 #[async_trait::async_trait]
 pub(crate) trait QueryResult {
@@ -19,8 +32,6 @@ pub(crate) trait QueryResult {
     async fn exception(&self);
 
     fn sequence_id(&self) -> u64;
-
-    // async fn source<B, C>(&self) -> impl QueryNode<B, C>;
 
     async fn data_source(&self) -> Box<dyn QueryResultID>;
 

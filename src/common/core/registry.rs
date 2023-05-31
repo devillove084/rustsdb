@@ -1,57 +1,70 @@
-use crate::common::{
-    core::tsdb_plugin::TSDBPlugin, data::time_series_datatype::TimeSeriesDataType,
-    pool::object_pool::ObjectPool,
-};
-use std::{collections::HashMap, future::Future};
+use dyn_clone::{clone_trait_object, DynClone};
 
-use super::tsdb::TSDB;
+use crate::{
+    common::{
+        core::tsdb_plugin::TSDBPlugin,
+        data::time_series_datatype::TimeSeriesDataType,
+        pool::{executor::ExecutorService, object_pool::ObjectPool},
+        query::{
+            interpolation::query_interpolator_factory::QueryInterpolatorFactory,
+            query_iter_factory::QueryIteratorFactory,
+            query_node_config::{Builder, QueryNodeConfig},
+            query_node_factory::QueryNodeFactory,
+        },
+    },
+    core::pool::shared_obj::SharedObject,
+};
+use std::collections::HashMap;
 
 #[async_trait::async_trait]
-pub(crate) trait Registry {
-    // type Object;
-    // type RegistryTSDB: TSDB;
-    // type RegisterTimeSeriesType: TimeSeriesDataType;
-    // type RegistryObjectPool: ObjectPool;
-
+pub(crate) trait Registry: DynClone {
     async fn initialize(&self, load_plugins: bool);
 
-    // async fn cleanup_pool(&self) -> dyn Future<Output = Self>;
+    async fn cleanup_pool(&self) -> ExecutorService;
 
-    async fn register_plugin(&self, id: String, plugin: dyn TSDBPlugin);
+    async fn register_plugin(&self, id: String, plugin: Box<dyn TSDBPlugin>);
 
-    // async fn get_default_plugin<U>(&self) -> Box<U>;
+    fn get_default_plugin(&self) -> Box<dyn TSDBPlugin>;
 
-    // async fn get_plugin<U>(&self, id: String) -> Box<U>;
+    fn get_plugin(&self, id: String) -> Box<dyn TSDBPlugin>;
 
-    // async fn get_plugins<U>(&self) -> Vec<Box<U>>;
+    fn get_plugins(&self) -> Vec<Box<dyn TSDBPlugin>>;
 
-    // async fn plugins<U>(&self) -> HashMap<Box<U>, HashMap<String, Box<dyn TSDBPlugin>>>;
+    fn get_plugins_with_id(&self) -> Vec<HashMap<String, Box<dyn TSDBPlugin>>>;
 
-    // TODO: Box<()> represent the java's Object
-    async fn register_shared_object(&self, id: String, obj: Box<()>) -> Box<()>;
+    async fn register_shared_object(&self, id: String, obj: SharedObject) -> SharedObject;
 
-    fn get_shared_object(&self, id: String) -> Box<()>;
+    fn get_shared_object(&self, id: String) -> SharedObject;
 
-    fn shared_object(&self) -> HashMap<String, Box<()>>;
+    fn shared_object(&self) -> HashMap<String, SharedObject>;
 
-    async fn register_object_pool(&self, pool: Box<dyn ObjectPool>);
+    fn register_object_pool(&self, pool: Box<dyn ObjectPool>);
 
     fn get_object_pool(&self, id: String) -> Box<dyn ObjectPool>;
 
-    // TODO: need add query node factory
+    fn register_type(&self, typ: Box<dyn TimeSeriesDataType>, name: String, is_default_name: bool);
 
-    async fn register_type(
-        &self,
-        typ: Box<dyn TimeSeriesDataType>,
-        name: String,
-        is_default_name: bool,
-    );
+    fn get_type(&self, name: String) -> Box<dyn TimeSeriesDataType>;
 
-    fn get_default_name(&self, tye: Box<dyn TimeSeriesDataType>) -> String;
+    fn get_default_type_name(&self, typ: Box<dyn TimeSeriesDataType>) -> String;
 
     fn type_map(&self) -> HashMap<String, Box<dyn TimeSeriesDataType>>;
 
     fn default_type_name_map(&self) -> HashMap<Box<dyn TimeSeriesDataType>, String>;
 
     async fn shutdown(&self);
+}
+
+clone_trait_object!(Registry);
+
+pub(crate) trait RegistryGetQueryOpt<B, C>
+where
+    B: Builder<B, C>,
+    C: QueryNodeConfig<B, C>,
+{
+    fn get_query_node_factory(&self, id: String) -> Box<dyn QueryNodeFactory<B, C>>;
+
+    fn get_query_iter_factory(&self, id: String) -> Box<dyn QueryIteratorFactory<B, C>>;
+
+    fn get_query_iter_interpolator_factory(&self, id: String) -> Box<dyn QueryInterpolatorFactory>;
 }

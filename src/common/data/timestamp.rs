@@ -1,5 +1,3 @@
-use super::Comparable;
-
 /// Provides common methods for interacting with timestamps.
 /// Implementations can provide as high or low resolution as desired.
 /// The `units` describe what resolution this timestamps is encoded at.

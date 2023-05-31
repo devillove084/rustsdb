@@ -1,5 +1,6 @@
 use bytes::Bytes;
 
+#[derive(Clone)]
 pub(crate) struct ConfigurationOverride {
     secret: bool,
     source: String,

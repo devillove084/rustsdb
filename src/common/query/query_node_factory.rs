@@ -1,3 +1,5 @@
+use dyn_clone::{clone_trait_object, DynClone};
+
 use crate::common::core::{tsdb::TSDB, tsdb_plugin::TSDBPlugin};
 
 use super::{
@@ -11,7 +13,7 @@ use super::{
 #[async_trait::async_trait]
 pub(crate) trait QueryNodeFactory<B, C>
 where
-    Self: TSDBPlugin,
+    Self: TSDBPlugin + DynClone,
     B: Builder<B, C>,
     C: QueryNodeConfig<B, C>,
 {
@@ -23,7 +25,7 @@ where
         &self,
         context: Box<dyn QueryPipelineContext<B, C>>,
         config: C,
-        planner: dyn QueryPlanner,
+        planner: Box<dyn QueryPlanner<B, C>>,
     );
 
     async fn new_node(
@@ -36,4 +38,14 @@ where
         context: Box<dyn QueryPipelineContext<B, C>>,
         config: C,
     ) -> Box<dyn QueryNode<B, C>>;
+}
+
+impl<B, C> Clone for Box<dyn QueryNodeFactory<B, C>>
+where
+    B: Builder<B, C> + Clone,
+    C: QueryNodeConfig<B, C> + Clone,
+{
+    fn clone(&self) -> Self {
+        todo!()
+    }
 }

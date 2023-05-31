@@ -1,33 +1,35 @@
-use std::future::Future;
-
+use dyn_clone::{clone_trait_object, DynClone};
 use hashed_wheel_timer::WheelTimer;
 
 use crate::common::configuration::Configuration;
 use crate::common::core::registry::Registry;
+use crate::common::pool::executor::ExecutorService;
 use crate::common::query::query_context::QueryContext;
+use crate::common::query::query_node_config::{Builder, QueryNodeConfig};
 use crate::common::stats::stats_collector::StatsCollector;
 use crate::common::threadpools::tsdb_thread_pool_executor::TSDBThreadPoolExecutor;
 #[async_trait::async_trait]
 #[allow(clippy::upper_case_acronyms)]
-pub(crate) trait TSDB {
-    async fn get_config(&self) -> Configuration;
+pub(crate) trait TSDB: DynClone + Send + Sync {
+    fn get_config(&self) -> Configuration;
 
-    async fn get_registry(&self) -> Box<dyn Registry>;
+    fn get_registry(&self) -> Box<dyn Registry>;
 
-    async fn get_stats_collector(&self) -> Box<dyn StatsCollector>;
+    fn get_stats_collector(&self) -> Box<dyn StatsCollector>;
 
-    async fn get_maintenance_timer(&self) -> WheelTimer;
+    fn get_maintenance_timer(&self) -> WheelTimer;
 
-    async fn get_query_thread_pool(&self) -> Box<dyn TSDBThreadPoolExecutor>;
+    fn get_query_thread_pool(&self) -> Box<dyn TSDBThreadPoolExecutor>;
 
-    // async fn quick_work_pool(&self) -> dyn Future<Output = Self>;
+    fn quick_work_pool(&self) -> ExecutorService;
 
-    async fn get_query_timer(&self) -> WheelTimer;
+    fn get_query_timer(&self) -> WheelTimer;
 
     async fn shutdown(&self);
 
-    // TODO: May query time servies id not u64.
-    async fn register_running_query(&self, hash: u64, context: dyn QueryContext) -> bool;
+    fn register_running_query(&self, hash: u64, context: Box<dyn QueryContext>) -> bool;
 
-    async fn complete_running_query(&self, hash: u64) -> bool;
+    fn complete_running_query(&self, hash: u64) -> bool;
 }
+
+clone_trait_object!(TSDB);
