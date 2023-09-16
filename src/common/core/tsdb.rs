@@ -1,13 +1,17 @@
 use dyn_clone::{clone_trait_object, DynClone};
 use hashed_wheel_timer::WheelTimer;
 
-use crate::common::configuration::Configuration;
-use crate::common::core::registry::Registry;
-use crate::common::pool::executor::ExecutorService;
-use crate::common::query::query_context::QueryContext;
-use crate::common::query::query_node_config::{Builder, QueryNodeConfig};
-use crate::common::stats::stats_collector::StatsCollector;
-use crate::common::threadpools::tsdb_thread_pool_executor::TSDBThreadPoolExecutor;
+use crate::common::{
+    configuration::configuration::Configuration,
+    core::registry::Registry,
+    pool::executor::ExecutorService,
+    query::{
+        query_context::QueryContext,
+        query_node_config::{Builder, QueryNodeConfig},
+    },
+    stats::stats_collector::StatsCollector,
+    threadpools::tsdb_thread_pool_executor::TSDBThreadPoolExecutor,
+};
 #[async_trait::async_trait]
 #[allow(clippy::upper_case_acronyms)]
 pub(crate) trait TSDB: DynClone + Send + Sync {

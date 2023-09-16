@@ -1,35 +1,29 @@
 use std::collections::HashMap;
-use std::hash::Hash;
-
-use crate::common::configuration::Configuration;
 
 use super::{query_node_config_options::QueryNodeConfigOptions, query_result_id::QueryResultID};
+use crate::common::configuration::configuration::Configuration;
 
 #[async_trait::async_trait]
-pub(crate) trait Builder<B, C>
-where
-    B: Builder<B, C>,
-    C: QueryNodeConfig<B, C>,
-{
-    fn set_id(&self, id: String) -> B;
+pub(crate) trait Builder {
+    fn set_id(&self, id: String) -> Box<dyn Builder>;
 
-    fn set_type(&self, typ: String) -> B;
+    fn set_type(&self, typ: String) -> Box<dyn Builder>;
 
-    fn set_sources(&self, sources: Vec<String>) -> B;
+    fn set_sources(&self, sources: Vec<String>) -> Box<dyn Builder>;
 
-    fn add_source(&self, source: String) -> B;
+    fn add_source(&self, source: String) -> Box<dyn Builder>;
 
-    fn set_overrides(&self, overrides: HashMap<String, String>) -> B;
+    fn set_overrides(&self, overrides: HashMap<String, String>) -> Box<dyn Builder>;
 
-    fn add_overrides(&self, key: String, value: String) -> B;
+    fn add_overrides(&self, key: String, value: String) -> Box<dyn Builder>;
 
-    fn set_result_ids(&self, result_ids: Vec<Box<dyn QueryResultID>>) -> B;
+    fn set_result_ids(&self, result_ids: Vec<Box<dyn QueryResultID>>) -> Box<dyn Builder>;
 
-    fn add_result_id(&self, result_id: Box<dyn QueryResultID>) -> B;
+    fn add_result_id(&self, result_id: Box<dyn QueryResultID>) -> Box<dyn Builder>;
 
-    async fn build(&self) -> B;
+    async fn build(&self) -> Box<dyn Builder>;
 
-    fn return_self(&self) -> B;
+    fn return_self(&self) -> Box<dyn Builder>;
 }
 
 #[async_trait::async_trait]
@@ -37,12 +31,7 @@ pub(crate) trait GetQueryNodeOption<T> {
     async fn node_options(option: QueryNodeConfigOptions) -> T;
 }
 
-#[async_trait::async_trait]
-pub(crate) trait QueryNodeConfig<B, C>
-where
-    B: Builder<B, C>,
-    C: QueryNodeConfig<B, C>,
-{
+pub(crate) trait QueryNodeConfig {
     fn get_id(&self) -> String;
 
     fn get_type(&self) -> String;
@@ -57,7 +46,7 @@ where
 
     fn is_read_cache(&self) -> bool;
 
-    async fn get_overrides(&self) -> HashMap<String, String>;
+    fn get_overrides(&self) -> HashMap<String, String>;
 
     fn get_string(&self, config: Configuration, key: String) -> String;
 
@@ -71,25 +60,25 @@ where
 
     fn has_key(&self, key: String) -> String;
 
-    async fn to_builder(&self) -> B;
+    fn to_builder(&self) -> Box<dyn Builder>;
 
     fn result_ids(&self) -> Vec<Box<dyn QueryResultID>>;
 
     fn is_marked_cacheable(&self) -> bool;
 
-    async fn mark_cacheable(&self);
+    fn mark_cacheable(&self);
 }
 
-impl<B, C> Hash for dyn QueryNodeConfig<B, C> {
-    fn hash<H: std::hash::Hasher>(&self, _state: &mut H) {
-        todo!()
-    }
-}
+// impl Hash for dyn QueryNodeConfig {
+//     fn hash<H: std::hash::Hasher>(&self, _state: &mut H) {
+//         todo!()
+//     }
+// }
 
-impl<B, C> PartialEq for dyn QueryNodeConfig<B, C> {
-    fn eq(&self, _other: &Self) -> bool {
-        todo!()
-    }
-}
+// impl PartialEq for dyn QueryNodeConfig {
+//     fn eq(&self, _other: &Self) -> bool {
+//         todo!()
+//     }
+// }
 
-impl<B, C> Eq for dyn QueryNodeConfig<B, C> {}
+// impl Eq for dyn QueryNodeConfig {}

@@ -1,13 +1,12 @@
 use std::hash::Hash;
 
-use crate::common::data::timestamp::TimeStamp;
-
 use super::{
     filter::{named_filter::NamedFilter, query_filter::QueryFilter},
     query_mode::QueryMode,
     query_node_config::{Builder, QueryNodeConfig},
     serdes::serdes_options::SerdesOptions,
 };
+use crate::common::data::timestamp::TimeStamp;
 
 pub(crate) enum LogLevel {
     OFF,
@@ -24,15 +23,6 @@ pub(crate) enum CacheMode {
     WRITEONLY,
     BYPASS,
     CLEAR,
-}
-
-#[async_trait::async_trait]
-trait AsyncGetExeGraph<B, C>
-where
-    B: Builder<B, C>,
-    C: QueryNodeConfig<B, C>,
-{
-    async fn get_execution_graph(&self) -> Vec<Box<dyn QueryNodeConfig<B, C>>>;
 }
 
 pub(crate) trait TimeSeriesQuery {
@@ -53,6 +43,8 @@ pub(crate) trait TimeSeriesQuery {
     fn start_time(&self) -> Box<dyn TimeStamp>;
 
     fn end_time(&self) -> Box<dyn TimeStamp>;
+
+    fn get_execution_graph(&self) -> Vec<Box<dyn QueryNodeConfig>>;
 
     fn get_serdes_configs(&self) -> Vec<Box<dyn SerdesOptions>>;
 

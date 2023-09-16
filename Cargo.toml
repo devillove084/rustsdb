@@ -7,9 +7,16 @@ edition = "2021"
 
 [dependencies]
 regex = "1.8.1"
+toml = "0.7.4"
+anyhow = "1.0.71"
+multimap = "0.9.0"
 async-trait = "0.1.68"
 hashed_wheel_timer = "0.1.1"
 petgraph = "0.6.3"
 dyn-clone = "1.0.11"
+clap = { version = "4.3.0", features = ["derive", "string"] }
+axum = "0.6.18"
+log = "0.4.18"
+env_logger = "0.10.0"
 tokio = { version = "1.28.1", features = ["full"] }
 bytes = { version = "1", features = ["serde"] }

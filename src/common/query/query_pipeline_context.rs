@@ -1,12 +1,3 @@
-use crate::common::{
-    core::tsdb::TSDB,
-    data::{
-        time_series_byte_id::TimeSeriesID, time_series_data_source::TimeSeriesDataSource,
-        time_series_data_source_config::TimeSeriesDataSourceConfig,
-    },
-    stats::span::Span,
-};
-
 use super::{
     query_context::QueryContext,
     query_node::QueryNode,
@@ -16,64 +7,55 @@ use super::{
     query_sink::QuerySink,
     time_series_query::TimeSeriesQuery,
 };
+use crate::common::{
+    core::tsdb::TSDB,
+    data::{
+        time_series_id::TimeSeriesID, time_series_data_source::TimeSeriesDataSource,
+        time_series_data_source_config::TimeSeriesDataSourceConfig,
+    },
+    stats::span::Span,
+};
 
-#[async_trait::async_trait]
-pub(crate) trait QueryPipelineContext<B, C>
-where
-    Self: QueryNode<B, C>,
-    B: Builder<B, C>,
-    C: QueryNodeConfig<B, C>,
-{
-    async fn factory(&self) -> Box<dyn QueryNodeFactory<B, C>>;
+pub(crate) trait QueryPipelineContext: QueryNode {
+    fn factory(&self) -> Box<dyn QueryNodeFactory>;
 
     fn tsdb(&self) -> Box<dyn TSDB>;
 
-    async fn query(&self) -> Box<dyn TimeSeriesQuery>;
+    fn query(&self) -> Box<dyn TimeSeriesQuery>;
 
-    async fn query_context(&self) -> Box<dyn QueryContext>;
+    fn query_context(&self) -> Box<dyn QueryContext>;
 
-    async fn initialize(&self, span: Box<dyn Span>);
+    fn initialize(&self, span: Box<dyn Span>);
 
-    async fn fetch_next(&self, span: Box<dyn Span>);
+    fn fetch_next(&self, span: Box<dyn Span>);
 
-    async fn upstream(&self, node: Box<dyn QueryNode<B, C>>) -> Vec<Box<dyn QueryNode<B, C>>>;
+    fn upstream(&self, node: Box<dyn QueryNode>) -> Vec<Box<dyn QueryNode>>;
 
-    async fn downstream(&self, node: Box<dyn QueryNode<B, C>>) -> Vec<Box<dyn QueryNode<B, C>>>;
+    fn downstream(&self, node: Box<dyn QueryNode>) -> Vec<Box<dyn QueryNode>>;
 
-    async fn downstream_sources(
+    fn downstream_sources(&self, node: Box<dyn QueryNode>) -> Vec<Box<dyn TimeSeriesDataSource>>;
+
+    fn common_source_config(&self, node: Box<dyn QueryNode>)
+    -> Box<dyn TimeSeriesDataSourceConfig>;
+
+    fn downstream_sources_ids(&self, node: Box<dyn QueryNode>) -> Vec<String>;
+
+    fn downstream_sources_result_ids(
         &self,
-        node: Box<dyn QueryNode<B, C>>,
-    ) -> Vec<Box<dyn TimeSeriesDataSource<B, C>>>;
-
-    async fn common_source_config(
-        &self,
-        node: Box<dyn QueryNode<B, C>>,
-    ) -> Box<dyn TimeSeriesDataSourceConfig<B, C>>;
-
-    async fn downstream_sources_ids(&self, node: Box<dyn QueryNode<B, C>>) -> Vec<String>;
-
-    async fn downstream_sources_result_ids(
-        &self,
-        node: Box<dyn QueryNode<B, C>>,
+        node: Box<dyn QueryNode>,
     ) -> Vec<Box<dyn QueryResultID>>;
 
-    async fn upstream_of_type(
-        &self,
-        node: Box<dyn QueryNode<B, C>>,
-    ) -> Vec<Box<dyn QueryNode<B, C>>>;
+    fn upstream_of_type(&self, node: Box<dyn QueryNode>) -> Vec<Box<dyn QueryNode>>;
 
-    async fn downstream_of_type(
-        &self,
-        node: Box<dyn QueryNode<B, C>>,
-    ) -> Vec<Box<dyn QueryNode<B, C>>>;
+    fn downstream_of_type(&self, node: Box<dyn QueryNode>) -> Vec<Box<dyn QueryNode>>;
 
-    async fn sinks(&self) -> Vec<Box<dyn QuerySink>>;
+    fn sinks(&self) -> Vec<Box<dyn QuerySink>>;
 
-    async fn add_id(&self, hash: u64, id: Box<dyn TimeSeriesID>);
+    fn add_id(&self, hash: u64, id: Box<dyn TimeSeriesID>);
 
-    async fn get_id(&self, hash: u64) -> Box<dyn TimeSeriesID>;
+    fn get_id(&self, hash: u64) -> Box<dyn TimeSeriesID>;
 
-    async fn has_id(&self, hash: u64) -> bool;
+    fn has_id(&self, hash: u64) -> bool;
 
-    async fn close(&self);
+    fn close(&self);
 }

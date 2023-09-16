@@ -1,9 +1,3 @@
-use crate::common::query::query_node_config::{Builder, QueryNodeConfig};
+use crate::common::query::query_node_config::QueryNodeConfig;
 
-pub(crate) trait TimeSeriesDataSourceConfig<B, C>
-where
-    Self: QueryNodeConfig<B, C>,
-    B: Builder<B, C>,
-    C: TimeSeriesDataSourceConfig<B, C>,
-{
-}
+pub(crate) trait TimeSeriesDataSourceConfig: QueryNodeConfig {}

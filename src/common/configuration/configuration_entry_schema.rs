@@ -2,7 +2,7 @@ use super::configuration_value_validator::ConfigurationValueValidator;
 
 pub(crate) struct ConfigurationEntrySchema {
     key: String,
-    //typ: T,
+    // typ: T,
     source: String,
     description: String,
     validator: Box<dyn ConfigurationValueValidator>,
@@ -12,4 +12,10 @@ pub(crate) struct ConfigurationEntrySchema {
     secret: bool,
     help_level: String,
     meta: String,
+}
+
+impl ConfigurationEntrySchema {
+    pub fn is_null(&self) -> bool {
+        todo!()
+    }
 }

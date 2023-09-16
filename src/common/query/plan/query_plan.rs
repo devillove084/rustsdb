@@ -31,67 +31,55 @@ pub(crate) struct TimeAdjustments {
 // }
 
 #[async_trait::async_trait]
-pub(crate) trait QueryPlanner<B, C>
-where
-    B: Builder<B, C>,
-    C: QueryNodeConfig<B, C>,
-{
-    async fn plan(&self, span: Box<dyn Span>);
+pub(crate) trait QueryPlanner {
+    async fn plan(&self, span: Box<dyn Span + Send>);
 
     async fn replace(
         &self,
-        old_config: Box<dyn QueryNodeConfig<B, C>>,
-        new_config: Box<dyn QueryNodeConfig<B, C>>,
+        old_config: Box<dyn QueryNodeConfig + Send>,
+        new_config: Box<dyn QueryNodeConfig + Send>,
     );
 
     async fn add_edge(
         &self,
-        from: Box<dyn QueryNodeConfig<B, C>>,
-        to: Box<dyn QueryNodeConfig<B, C>>,
+        from: Box<dyn QueryNodeConfig + Send>,
+        to: Box<dyn QueryNodeConfig + Send>,
     ) -> bool;
 
     async fn remove_edge(
         &self,
-        from: Box<dyn QueryNodeConfig<B, C>>,
-        to: Box<dyn QueryNodeConfig<B, C>>,
+        from: Box<dyn QueryNodeConfig + Send>,
+        to: Box<dyn QueryNodeConfig + Send>,
     ) -> bool;
 
-    async fn remove_node(&self, config: Box<dyn QueryNodeConfig<B, C>>) -> bool;
+    async fn remove_node(&self, config: Box<dyn QueryNodeConfig + Send>) -> bool;
 
-    async fn graph(&self) -> Graph<Box<dyn QueryNode<B, C>>, Box<dyn QueryNode<B, C>>>;
+    fn graph(&self) -> Graph<Box<dyn QueryNode>, Box<dyn QueryNode>>;
 
-    async fn config_graph(
-        &self,
-    ) -> Graph<Box<dyn QueryNodeConfig<B, C>>, Box<dyn QueryNodeConfig<B, C>>>;
+    fn config_graph(&self) -> Graph<Box<dyn QueryNodeConfig>, Box<dyn QueryNodeConfig>>;
 
-    async fn context(&self) -> Box<dyn QueryPipelineContext<B, C>>;
+    fn context(&self) -> Box<dyn QueryPipelineContext>;
 
-    async fn node_for_id(&self, id: String) -> Box<dyn QueryNode<B, C>>;
+    fn node_for_id(&self, id: String) -> Box<dyn QueryNode>;
 
-    async fn get_factory(
-        &self,
-        node: Box<dyn QueryNodeConfig<B, C>>,
-    ) -> Box<dyn QueryNodeFactory<B, C>>;
+    fn get_factory(&self, node: Box<dyn QueryNodeConfig>) -> Box<dyn QueryNodeFactory>;
 
     async fn terminal_source_node(
         &self,
-        config: Box<dyn QueryNodeConfig<B, C>>,
-    ) -> Vec<Box<dyn QueryNodeConfig<B, C>>>;
+        config: Box<dyn QueryNodeConfig + Send>,
+    ) -> Vec<Box<dyn QueryNodeConfig + Send>>;
 
-    async fn get_metric_for_data_source(
+    fn get_metric_for_data_source(
         &self,
-        node: Box<dyn QueryNodeConfig<B, C>>,
+        node: Box<dyn QueryNodeConfig>,
         data_source_id: String,
     ) -> String;
 
-    async fn get_adjustments(
-        &self,
-        config: Box<dyn TimeSeriesDataSourceConfig<B, C>>,
-    ) -> TimeAdjustments;
+    fn get_adjustments(&self, config: Box<dyn TimeSeriesDataSourceConfig>) -> TimeAdjustments;
 
     async fn base_setup_graph(
         &self,
-        context: Box<dyn QueryPipelineContext<B, C>>,
-        config: Box<dyn TimeSeriesDataSourceConfig<B, C>>,
+        context: Box<dyn QueryPipelineContext + Send>,
+        config: Box<dyn TimeSeriesDataSourceConfig + Send>,
     );
 }

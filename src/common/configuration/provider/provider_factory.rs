@@ -1,8 +1,7 @@
 use hashed_wheel_timer::WheelTimer;
 
-use crate::common::configuration::Configuration;
-
 use super::Provider;
+use crate::common::configuration::configuration::Configuration;
 
 #[async_trait::async_trait]
 pub(crate) trait ProviderFactory {

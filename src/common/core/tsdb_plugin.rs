@@ -1,8 +1,8 @@
 use crate::common::core::tsdb::TSDB;
 
 #[async_trait::async_trait]
-pub(crate) trait TSDBPlugin: Send + Sync {
-    fn typ(&self) -> String;
+pub(crate) trait TSDBPlugin {
+    fn get_type(&self) -> String;
 
     fn id(&self) -> String;
 

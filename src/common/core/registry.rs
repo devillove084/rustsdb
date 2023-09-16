@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use dyn_clone::{clone_trait_object, DynClone};
 
 use crate::{
@@ -14,7 +16,6 @@ use crate::{
     },
     core::pool::shared_obj::SharedObject,
 };
-use std::collections::HashMap;
 
 #[async_trait::async_trait]
 pub(crate) trait Registry: DynClone {
@@ -22,7 +23,7 @@ pub(crate) trait Registry: DynClone {
 
     async fn cleanup_pool(&self) -> ExecutorService;
 
-    async fn register_plugin(&self, id: String, plugin: Box<dyn TSDBPlugin>);
+    async fn register_plugin(&self, id: String, plugin: Box<dyn TSDBPlugin + Send>);
 
     fn get_default_plugin(&self) -> Box<dyn TSDBPlugin>;
 
@@ -57,14 +58,10 @@ pub(crate) trait Registry: DynClone {
 
 clone_trait_object!(Registry);
 
-pub(crate) trait RegistryGetQueryOpt<B, C>
-where
-    B: Builder<B, C>,
-    C: QueryNodeConfig<B, C>,
-{
-    fn get_query_node_factory(&self, id: String) -> Box<dyn QueryNodeFactory<B, C>>;
+pub(crate) trait RegistryGetQueryOpt {
+    fn get_query_node_factory(&self, id: String) -> Box<dyn QueryNodeFactory>;
 
-    fn get_query_iter_factory(&self, id: String) -> Box<dyn QueryIteratorFactory<B, C>>;
+    fn get_query_iter_factory(&self, id: String) -> Box<dyn QueryIteratorFactory>;
 
     fn get_query_iter_interpolator_factory(&self, id: String) -> Box<dyn QueryInterpolatorFactory>;
 }

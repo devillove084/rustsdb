@@ -2,6 +2,7 @@ pub mod filter;
 pub mod interpolation;
 pub mod plan;
 pub mod query_context;
+pub mod query_context_builder;
 pub mod query_fill_policy;
 pub mod query_iter_factory;
 pub mod query_mode;

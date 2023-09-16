@@ -1,11 +1,31 @@
-pub(crate) trait TimeSeriesID {
-    // True if the fields are encoded using a format specified by a storage engine.
-    fn encode(&self) -> bool;
+use std::collections::{HashMap, HashSet};
 
-    // A signed 64 bit hash code for collision reduction.
-    // return a hash as u64
-    fn hashcode(&self) -> u64;
+use bytes::Bytes;
 
-    // The type series dealt with. Either a `TimeSeriesByteID` or `TimeSeriesStringID`.
-    // fn get_type<T: TimeSeriesID>(&self, _: T) -> &str;
+use super::{
+    time_series_data_source_factory::TimeSeriesDataSourceFactory, time_series_id::TimeSeriesID,
+    time_series_string_id::TimeSeriesStringID,
+};
+use crate::common::stats::span::Span;
+
+pub(crate) trait TimeSeriesByteID: TimeSeriesID {
+    fn data_store(&self) -> Box<dyn TimeSeriesDataSourceFactory>;
+
+    fn alias(&self) -> Vec<Bytes>;
+
+    fn namespace(&self) -> Vec<Bytes>;
+
+    fn metric(&self) -> Vec<Bytes>;
+
+    fn tags(&self) -> HashMap<Vec<Bytes>, Vec<Bytes>>;
+
+    fn aggregated_tags(&self) -> Vec<Vec<Bytes>>;
+
+    fn disjoint_tags(&self) -> Vec<Vec<Bytes>>;
+
+    fn unique_ids(&self) -> HashSet<Bytes>;
+
+    fn skip_metric(&self) -> bool;
+
+    fn decode(&self, cache: bool, span: Box<dyn Span>) -> Box<dyn TimeSeriesStringID>;
 }

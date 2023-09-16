@@ -1,9 +1,8 @@
 use bytes::Bytes;
 use hashed_wheel_timer::WheelTimer;
 
-use crate::common::configuration::Configuration;
-
 use super::provider_factory::ProviderFactory;
+use crate::common::configuration::configuration::Configuration;
 
 #[async_trait::async_trait]
 pub(crate) trait SecretProvider {

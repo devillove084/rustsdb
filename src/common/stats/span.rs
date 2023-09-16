@@ -1,6 +1,6 @@
 #[async_trait::async_trait]
 pub(crate) trait Span {
-    //type Object;
+    // type Object;
 
     async fn finish(&self);
 

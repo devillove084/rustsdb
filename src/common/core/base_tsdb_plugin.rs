@@ -15,7 +15,7 @@ impl TSDBPlugin for BaseTSDBPlugin {
         self.id.clone()
     }
 
-    fn typ(&self) -> String {
+    fn get_type(&self) -> String {
         todo!()
     }
 

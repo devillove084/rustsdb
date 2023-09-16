@@ -1,6 +1,6 @@
 use super::{
-    partial_time_series_set::PartialTimeSeriesSet, time_series_byte_id::TimeSeriesID,
-    time_series_datatype::TimeSeriesDataType,
+    partial_time_series_set::PartialTimeSeriesSet, time_series_datatype::TimeSeriesDataType,
+    time_series_id::TimeSeriesID,
 };
 
 pub(crate) trait PartialTimeSeries: TimeSeriesDataType {

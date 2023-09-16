@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+use super::plugin_config::PluginsConfig;
 use crate::{
     common::{
         core::{
@@ -11,9 +12,7 @@ use crate::{
         pool::{executor::ExecutorService, object_pool::ObjectPool},
         query::{
             interpolation::query_interpolator_factory::QueryInterpolatorFactory,
-            query_iter_factory::QueryIteratorFactory,
-            query_node_config::{Builder, QueryNodeConfig},
-            query_node_factory::QueryNodeFactory,
+            query_iter_factory::QueryIteratorFactory, query_node_factory::QueryNodeFactory,
             serdes::time_series_serdes::TimeSeriesSerdes,
         },
     },
@@ -26,8 +25,6 @@ use crate::{
     },
 };
 
-use super::plugin_config::PluginsConfig;
-
 pub const PLUGIN_CONFIG_KEY: &str = "tsd.plugin.config";
 pub const V2_LOAD_FILTERS_KEY: &str = "tsd.plugin.v2.load_filters";
 pub const DEFAULT_CLUSTERS_KEY: &str = "tsd.query.default_clusters";
@@ -35,46 +32,26 @@ pub const DEFAULT_GRAPHS_KEY: &str = "tsd.query.default_execution_graphs";
 
 #[allow(dead_code)]
 #[derive(Clone)]
-pub(crate) struct DefaultRegistry<B, C>
-where
-    Box<dyn TimeSeriesSerdes<B, C>>: Clone,
-    Box<dyn QueryNodeFactory<B, C>>: Clone,
-{
+pub(crate) struct DefaultRegistry {
     tsdb: Box<dyn TSDB>,
     type_map: HashMap<String, Box<dyn TimeSeriesDataType>>,
     default_type_name_map: HashMap<Box<dyn TimeSeriesDataType>, String>,
     factories: HashMap<String, Box<dyn QueryExecutorFactory>>,
     clusters: HashMap<String, HAClusterConfig>,
-    serdes: HashMap<String, Box<dyn TimeSeriesSerdes<B, C>>>,
-    node_factories: HashMap<String, Box<dyn QueryNodeFactory<B, C>>>,
+    serdes: HashMap<String, Box<dyn TimeSeriesSerdes>>,
+    node_factories: HashMap<String, Box<dyn QueryNodeFactory>>,
     shared_objects: HashMap<String, SharedObject>,
     pools: HashMap<String, Box<dyn ObjectPool>>,
     cleanup_pool: ExecutorService,
     plugins: PluginsConfig,
 }
 
-unsafe impl<B, C> Send for DefaultRegistry<B, C>
-where
-    Box<dyn TimeSeriesSerdes<B, C>>: Clone,
-    Box<dyn QueryNodeFactory<B, C>>: Clone,
-{
-}
+unsafe impl Send for DefaultRegistry {}
 
-unsafe impl<B, C> Sync for DefaultRegistry<B, C>
-where
-    Box<dyn TimeSeriesSerdes<B, C>>: Clone,
-    Box<dyn QueryNodeFactory<B, C>>: Clone,
-{
-}
+unsafe impl Sync for DefaultRegistry {}
 
 #[async_trait::async_trait]
-impl<B, C> Registry for DefaultRegistry<B, C>
-where
-    Box<dyn TimeSeriesSerdes<B, C>>: Clone,
-    Box<dyn QueryNodeFactory<B, C>>: Clone,
-    B: Clone,
-    C: Clone,
-{
+impl Registry for DefaultRegistry {
     async fn initialize(&self, _load_plugins: bool) {
         todo!()
     }
@@ -83,7 +60,7 @@ where
         todo!()
     }
 
-    async fn register_plugin(&self, _id: String, _plugin: Box<dyn TSDBPlugin>) {
+    async fn register_plugin(&self, _id: String, _plugin: Box<dyn TSDBPlugin + Send>) {
         todo!()
     }
 
@@ -153,14 +130,8 @@ where
     }
 }
 
-impl<B, C> RegistryGetQueryOpt<B, C> for DefaultRegistry<B, C>
-where
-    B: Builder<B, C>,
-    C: QueryNodeConfig<B, C>,
-    Box<dyn TimeSeriesSerdes<B, C>>: Clone,
-    Box<dyn QueryNodeFactory<B, C>>: Clone,
-{
-    fn get_query_iter_factory(&self, _id: String) -> Box<dyn QueryIteratorFactory<B, C>> {
+impl RegistryGetQueryOpt for DefaultRegistry {
+    fn get_query_iter_factory(&self, _id: String) -> Box<dyn QueryIteratorFactory> {
         todo!()
     }
 
@@ -171,7 +142,7 @@ where
         todo!()
     }
 
-    fn get_query_node_factory(&self, _id: String) -> Box<dyn QueryNodeFactory<B, C>> {
+    fn get_query_node_factory(&self, _id: String) -> Box<dyn QueryNodeFactory> {
         todo!()
     }
 }

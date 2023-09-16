@@ -1,9 +1,10 @@
 use std::collections::HashMap;
 
+use anyhow::Result;
 use hashed_wheel_timer::WheelTimer;
 
 use crate::common::{
-    configuration::Configuration,
+    configuration::configuration::Configuration,
     core::{registry::Registry, tsdb::TSDB},
     pool::executor::ExecutorService,
     query::query_context::QueryContext,
@@ -85,11 +86,11 @@ impl TSDB for DefaultTSDB {
 
 #[allow(dead_code)]
 impl DefaultTSDB {
-    fn new_default_tsdb(&self, _config: Configuration) -> Self {
+    pub fn new(_config: Configuration) -> Self {
         todo!()
     }
 
-    async fn initialize_registry(&self, _load_plugin: bool) {
+    pub async fn initialize_registry(&self, _load_plugin: bool) -> Result<()> {
         todo!()
     }
 }

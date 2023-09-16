@@ -1,5 +1,5 @@
 use super::{
-    time_series_byte_id::TimeSeriesID, time_series_datatype::TimeSeriesDataType,
+    time_series_id::TimeSeriesID, time_series_datatype::TimeSeriesDataType,
     typed_time_series_iter::TypedTimeSeriesIterator,
 };
 
